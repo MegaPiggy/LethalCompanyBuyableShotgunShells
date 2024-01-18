@@ -19,6 +19,12 @@ body:
       description: If applicable, describe what should have happened instead.
     validations:
       required: false
+  - type: input
+    id: gameVersion
+    attributes:
+      label: Game version
+      description: The current version of Lethal Company that you are playing on.
+      placeholder: v40, v45, v47, v48, v49, or etc.
   - type: textarea
     id: mods
     attributes:
