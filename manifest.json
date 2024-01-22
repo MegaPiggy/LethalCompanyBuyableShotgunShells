@@ -1,11 +1,11 @@
 {
   "name": "BuyableShotgunShells",
-  "version_number": "1.0.3",
+  "version_number": "1.0.4",
   "website_url": "https://github.com/MegaPiggy/LethalCompanyBuyableShotgunShells",
   "description": "Adds shotgun shells to the store for 20 credits",
   "dependencies": [
     "BepInEx-BepInExPack-5.4.2100",
-    "Evaisa-LethalLib-0.3.0",
+    "Evaisa-LethalLib-0.13.2",
     "Evaisa-HookGenPatcher-0.0.5"
   ]
 }

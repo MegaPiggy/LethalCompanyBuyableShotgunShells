@@ -1,3 +1,6 @@
+#### 1.0.4
+- Small fix for scan node error
+
 #### 1.0.3
 - Changes to how I register the items
 
