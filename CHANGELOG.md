@@ -1,3 +1,6 @@
+#### 1.0.5
+- Fixed white block icon and interaction bug that happens with Brutal Company Minus
+
 #### 1.0.4
 - Small fix for scan node error
 

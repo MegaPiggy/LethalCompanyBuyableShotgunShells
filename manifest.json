@@ -1,6 +1,6 @@
 {
   "name": "BuyableShotgunShells",
-  "version_number": "1.0.4",
+  "version_number": "1.0.5",
   "website_url": "https://github.com/MegaPiggy/LethalCompanyBuyableShotgunShells",
   "description": "Adds shotgun shells to the store for 20 credits",
   "dependencies": [
