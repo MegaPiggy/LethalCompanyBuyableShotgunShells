@@ -8,6 +8,7 @@ using LethalLib.Modules;
 using UnityEngine.SceneManagement;
 using BepInEx.Configuration;
 using System;
+using System.Reflection;
 
 namespace BuyableShotgunShells
 {
@@ -97,25 +98,18 @@ namespace BuyableShotgunShells
         private void CloneNonScrap(Item original, Item clone, int price)
         {
             DontDestroyOnLoad(original.spawnPrefab);
+            CopyFields(original, clone);
             clone.name = "Buyable" + original.name;
-            clone.itemName = original.itemName;
-            clone.itemId = original.itemId;
-            clone.spawnPrefab = original.spawnPrefab;
             clone.creditsWorth = price;
-            clone.canBeGrabbedBeforeGameStart = original.canBeGrabbedBeforeGameStart;
-            clone.automaticallySetUsingPower = original.automaticallySetUsingPower;
-            clone.batteryUsage = original.batteryUsage;
-            clone.canBeInspected = original.canBeInspected;
-            clone.isDefensiveWeapon = original.isDefensiveWeapon;
-            clone.saveItemVariable = original.saveItemVariable;
-            clone.syncGrabFunction = original.syncGrabFunction;
-            clone.twoHandedAnimation = original.twoHandedAnimation;
-            clone.weight = original.weight;
-            clone.floorYOffset = original.floorYOffset;
-            clone.positionOffset = original.positionOffset;
-            clone.rotationOffset = original.rotationOffset;
-            clone.restingRotation = original.restingRotation;
-            clone.verticalOffset = original.verticalOffset;
+        }
+
+        public static void CopyFields(Item source, Item destination)
+        {
+            FieldInfo[] fields = typeof(Item).GetFields();
+            foreach (FieldInfo field in fields)
+            {
+                field.SetValue(destination, field.GetValue(source));
+            }
         }
 
         private static Dictionary<string, TerminalNode> infoNodes = new Dictionary<string, TerminalNode>();
