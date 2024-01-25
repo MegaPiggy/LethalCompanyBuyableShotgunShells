@@ -25,6 +25,8 @@ body:
       label: Game version
       description: The current version of Lethal Company that you are playing on.
       placeholder: v40, v45, v47, v48, v49, or etc.
+    validations:
+      required: true
   - type: textarea
     id: mods
     attributes:
@@ -32,7 +34,7 @@ body:
       description: Please define which mods you had enabled when the problem occurred. A profile code would also be useful.
       render: Markdown
     validations:
-      required: false
+      required: true
   - type: textarea
     id: logs
     attributes:
