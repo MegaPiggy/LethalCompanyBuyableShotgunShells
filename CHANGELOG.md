@@ -1,3 +1,7 @@
+#### 1.1.0
+- Made the buyable shells its own prefab instead of just using vanilla one.
+     - This should hopefully fix some issues where the host was the only one who could see or interact with the shells.
+
 #### 1.0.5
 - Fixed white block icon and interaction bug that happens with Brutal Company Minus
 
