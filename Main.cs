@@ -110,7 +110,9 @@ namespace BuyableShotgunShells
 
         private static GameObject CloneNonScrap(Item original, Item clone, int price)
         {
+            GameObject.Destroy(clone.spawnPrefab);
             var prefab = NetworkPrefabs.CloneNetworkPrefab(original.spawnPrefab);
+            prefab.AddComponent<Unflagger>();
             DontDestroyOnLoad(prefab);
             CopyFields(original, clone);
             prefab.GetComponent<GrabbableObject>().itemProperties = clone;
@@ -219,6 +221,18 @@ namespace BuyableShotgunShells
             {
                 LoggerInstance.LogError($"Failed to receive config: {ex}");
                 ShellPriceRemote = -1;
+            }
+        }
+
+        /// <summary>
+        /// For what ever reason the hide flags were set to HideAndDontSave, which caused it to not save obviously.
+        /// I'm not sure what sets and I don't want to bother finding out when a fix like this is so easy.
+        /// </summary>
+        internal class Unflagger : MonoBehaviour
+        {
+            public void Awake()
+            {
+                gameObject.hideFlags = HideFlags.None;
             }
         }
 
