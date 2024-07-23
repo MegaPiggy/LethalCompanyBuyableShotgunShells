@@ -1,3 +1,7 @@
+#### 1.2.0
+- Price now syncs between host and clients
+- Fixed problem where flags were set to hide and dont save
+
 #### 1.1.0
 - Made the buyable shells its own prefab instead of just using vanilla one.
      - This should hopefully fix some issues where the host was the only one who could see or interact with the shells.
