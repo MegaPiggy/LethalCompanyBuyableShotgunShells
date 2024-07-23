@@ -7,8 +7,12 @@ using UnityEngine;
 using LethalLib.Modules;
 using UnityEngine.SceneManagement;
 using BepInEx.Configuration;
-using System;
+using Unity.Netcode;
 using System.Reflection;
+using System;
+using NetworkPrefabs = LethalLib.Modules.NetworkPrefabs;
+using Unity.Collections;
+using GameNetcodeStuff;
 
 namespace BuyableShotgunShells
 {
@@ -33,7 +37,11 @@ namespace BuyableShotgunShells
 
 
         private static ConfigEntry<int> ShellPriceConfig;
-        public static int ShellPrice => ShellPriceConfig.Value;
+        public static int ShellPriceLocal => ShellPriceConfig.Value;
+        internal static int ShellPriceRemote = -1;
+        public static int ShellPrice => ShellPriceRemote > -1 ? ShellPriceRemote : ShellPriceLocal;
+        private static bool IsHost => NetworkManager.Singleton.IsHost;
+        private static ulong LocalClientId => NetworkManager.Singleton.LocalClientId;
 
         private void Awake()
         {
@@ -146,6 +154,101 @@ namespace BuyableShotgunShells
         {
             Items.RegisterShopItem(ShotgunShellClone, price: ShellPrice, itemInfo: CreateInfoNode("ShotgunShell", "Ammo for the Nutcracker's Shotgun."));
             LoggerInstance.LogInfo($"Shotgun Shell added to Shop for {ShellPrice} credits");
+        }
+
+        private static void UpdateShopItemPrice()
+        {
+            ShotgunShellClone.creditsWorth = ShellPrice;
+            Items.UpdateShopItemPrice(ShotgunShellClone, price: ShellPrice);
+            LoggerInstance.LogInfo($"Shotgun Shell price updated to {ShellPrice} credits");
+        }
+
+        public static byte CurrentVersionByte = 1;
+
+        public static void WriteData(FastBufferWriter writer)
+        {
+            writer.WriteByte(CurrentVersionByte);
+            writer.WriteBytes(BitConverter.GetBytes(ShellPriceLocal));
+        }
+
+        public static void ReadData(FastBufferReader reader)
+        {
+            reader.ReadByte(out byte version);
+            if (version == CurrentVersionByte)
+            {
+                var priceBytes = new byte[4];
+                reader.ReadBytes(ref priceBytes, 4);
+                ShellPriceRemote = BitConverter.ToInt32(priceBytes, 0);
+                UpdateShopItemPrice();
+                LoggerInstance.LogInfo("Host config set successfully");
+                return;
+            }
+            throw new Exception("Invalid version byte");
+        }
+
+        public static void OnRequestSync(ulong clientID, FastBufferReader reader)
+        {
+            if (IsHost)
+            {
+                LoggerInstance.LogInfo("Sending config to client " + clientID.ToString());
+                FastBufferWriter writer = new FastBufferWriter(5, Allocator.Temp, 5);
+                try
+                {
+                    WriteData(writer);
+                    NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("BuyableShotgunShells_OnReceiveConfigSync", clientID, writer, NetworkDelivery.Reliable);
+                }
+                catch (Exception ex)
+                {
+                    LoggerInstance.LogError($"Failed to send config: {ex}");
+                }
+                finally
+                {
+                    writer.Dispose();
+                }
+            }
+        }
+
+        public static void OnReceiveSync(ulong clientID, FastBufferReader reader)
+        {
+            LoggerInstance.LogInfo("Received config from host");
+            try
+            {
+                ReadData(reader);
+            }
+            catch (Exception ex)
+            {
+                LoggerInstance.LogError($"Failed to receive config: {ex}");
+                ShellPriceRemote = -1;
+            }
+        }
+
+        [HarmonyPatch]
+        internal static class Patches
+        {
+            [HarmonyPostfix]
+            [HarmonyPatch(typeof(PlayerControllerB), "ConnectClientToPlayerObject")]
+            public static void ServerConnect()
+            {
+                if (IsHost)
+                {
+                    LoggerInstance.LogInfo("Started hosting, using local settings");
+                    NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler("BuyableShotgunShells_OnRequestConfigSync", OnRequestSync);
+                }
+                else
+                {
+                    LoggerInstance.LogInfo("Connected to server, requesting settings");
+                    NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler("BuyableShotgunShells_OnReceiveConfigSync", OnReceiveSync);
+                    NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("BuyableShotgunShells_OnRequestConfigSync", 0, new FastBufferWriter(0, Allocator.Temp), NetworkDelivery.Reliable);
+                }
+            }
+
+            [HarmonyPostfix]
+            [HarmonyPatch(typeof(GameNetworkManager), "StartDisconnect")]
+            public static void ServerDisconnect()
+            {
+                LoggerInstance.LogInfo("Server disconnect");
+                ShellPriceRemote = -1;
+            }
         }
     }
 }
