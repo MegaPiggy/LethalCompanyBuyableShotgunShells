@@ -1,5 +1,5 @@
 #### 1.2.1
-- No longer breaks if another mod adds in a shotgun that has no spawn prefab.
+- No longer breaks if another mod adds in shells that have no spawn prefab.
 - Changed to load with a patch instead of the scene loaded event so that this mod doesn't break when somebody else's mod exceptions in that event.
 
 #### 1.2.0
