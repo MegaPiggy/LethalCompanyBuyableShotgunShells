@@ -483,7 +483,7 @@
     </None>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="echo ‎&#xD;&#xA;echo         Transferring files to $(BepInExPluginsDirectory)\$(ModName)&#xD;&#xA;@rmdir /Q /S &quot;$(BepInExPluginsDirectory)\$(ModName)\&quot;&#xD;&#xA;@md &quot;$(BepInExPluginsDirectory)\$(ModName)\&quot;&#xD;&#xA;@copy /y &quot;$(ProjectDir)manifest.json&quot; &quot;$(BepInExPluginsDirectory)\$(ModName)\&quot;&#xD;&#xA;@copy /y &quot;$(ProjectDir)icon.png&quot; &quot;$(BepInExPluginsDirectory)\$(ModName)\&quot;&#xD;&#xA;@copy /y &quot;$(TargetPath)&quot; &quot;$(BepInExPluginsDirectory)\$(ModName)\&quot;&#xD;&#xA;@copy /y &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;$(BepInExPluginsDirectory)\$(ModName)\&quot;&#xD;&#xA;echo ‎" />
+    <Exec Command="echo ‎&#xD;&#xA;echo         Transferring files to $(BepInExPluginsDirectory)\$(ModName)&#xD;&#xA;@rmdir /Q /S &quot;$(BepInExPluginsDirectory)\$(ModName)\&quot;&#xD;&#xA;@md &quot;$(BepInExPluginsDirectory)\$(ModName)\&quot;&#xD;&#xA;@copy /y &quot;$(ProjectDir)manifest.json&quot; &quot;$(BepInExPluginsDirectory)\$(ModName)\&quot;&#xD;&#xA;@copy /y &quot;$(ProjectDir)README.md&quot; &quot;$(BepInExPluginsDirectory)\$(ModName)\&quot;&#xD;&#xA;@copy /y &quot;$(ProjectDir)CHANGELOG.md&quot; &quot;$(BepInExPluginsDirectory)\$(ModName)\&quot;&#xD;&#xA;@copy /y &quot;$(ProjectDir)icon.png&quot; &quot;$(BepInExPluginsDirectory)\$(ModName)\&quot;&#xD;&#xA;@copy /y &quot;$(TargetPath)&quot; &quot;$(BepInExPluginsDirectory)\$(ModName)\&quot;&#xD;&#xA;@copy /y &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;$(BepInExPluginsDirectory)\$(ModName)\&quot;&#xD;&#xA;echo ‎" />
   </Target>
   <ProjectExtensions>
     <VisualStudio>
