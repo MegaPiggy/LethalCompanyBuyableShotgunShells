@@ -52,7 +52,7 @@ namespace BuyableShotgunShells
             }
             harmony.PatchAll();
             ShellPriceConfig = Config.Bind("Prices", "ShotgunShellPrice", 20, "Credits needed to buy shotgun shells");
-            SceneManager.sceneLoaded += OnSceneLoaded;
+            //SceneManager.sceneLoaded += OnSceneLoaded;
             ShotgunShellClone = MakeNonScrap(ShellPrice);
             AddToShop();
             Logger.LogInfo($"Plugin {modName} is loaded with version {modVersion}!");
@@ -145,6 +145,11 @@ namespace BuyableShotgunShells
         }
 
         private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            CloneShells();
+        }
+
+        private static void CloneShells()
         {
             if (ShotgunShell == null) return;
             if (ShotgunShellObjectClone != null) return;
@@ -254,6 +259,14 @@ namespace BuyableShotgunShells
                     NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler("BuyableShotgunShells_OnReceiveConfigSync", OnReceiveSync);
                     NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage("BuyableShotgunShells_OnRequestConfigSync", 0, new FastBufferWriter(0, Allocator.Temp), NetworkDelivery.Reliable);
                 }
+            }
+
+            [HarmonyPostfix]
+            [HarmonyPatch(typeof(GameNetworkManager), "Start")]
+            public static void Start()
+            {
+                LoggerInstance.LogWarning("Game network manager start");
+                CloneShells();
             }
 
             [HarmonyPostfix]
