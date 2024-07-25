@@ -1,3 +1,7 @@
+#### 1.2.1
+- No longer breaks if another mod adds in a shotgun that has no spawn prefab.
+- Changed to load with a patch instead of the scene loaded event so that this mod doesn't break when somebody else's mod exceptions in that event.
+
 #### 1.2.0
 - Price now syncs between host and clients
 - Fixed problem where flags were set to hide and dont save
