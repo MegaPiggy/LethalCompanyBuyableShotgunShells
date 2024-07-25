@@ -252,6 +252,7 @@ namespace BuyableShotgunShells
                 {
                     LoggerInstance.LogInfo("Started hosting, using local settings");
                     NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler("BuyableShotgunShells_OnRequestConfigSync", OnRequestSync);
+                    UpdateShopItemPrice();
                 }
                 else
                 {
