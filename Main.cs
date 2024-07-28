@@ -30,7 +30,8 @@ namespace BuyableShotgunShells
 
         private static ManualLogSource LoggerInstance => Instance.Logger;
 
-        public static List<Item> AllItems => Resources.FindObjectsOfTypeAll<Item>().Reverse().ToList();
+        public static StartOfRound StartOfRound => StartOfRound.Instance;
+        public static List<Item> AllItems => StartOfRound.allItemsList.itemsList.ToList();
         public static Item ShotgunShell => AllItems.FirstOrDefault(item => item.name.Equals("GunAmmo") && item.spawnPrefab != null);
         public static ClonedItem ShotgunShellClone { get; private set; }
 
@@ -100,6 +101,8 @@ namespace BuyableShotgunShells
 
         private static void CloneShells()
         {
+            if (StartOfRound == null) return;
+            if (AllItems == null) return;
             if (ShotgunShell == null) return;
             if (ShotgunShellClone != null) return;
             ShotgunShellClone = CloneNonScrap(ShotgunShell, ShellPrice);
@@ -213,10 +216,10 @@ namespace BuyableShotgunShells
             }
 
             [HarmonyPostfix]
-            [HarmonyPatch(typeof(GameNetworkManager), "Start")]
-            public static void Start()
+            [HarmonyPatch(typeof(StartOfRound), "Awake")]
+            public static void Awake()
             {
-                LoggerInstance.LogWarning("Game network manager start");
+                LoggerInstance.LogWarning("Start of round awake");
                 CloneShells();
             }
 
