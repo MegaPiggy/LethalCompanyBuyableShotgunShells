@@ -32,7 +32,7 @@ namespace BuyableShotgunShells
 
         public static List<Item> AllItems => Resources.FindObjectsOfTypeAll<Item>().Reverse().ToList();
         public static Item ShotgunShell => AllItems.FirstOrDefault(item => item.name.Equals("GunAmmo") && item.spawnPrefab != null);
-        public static Item ShotgunShellClone { get; private set; }
+        public static ClonedItem ShotgunShellClone { get; private set; }
         public static GameObject ShotgunShellObjectClone { get; private set; }
 
 
@@ -58,9 +58,14 @@ namespace BuyableShotgunShells
             Logger.LogInfo($"Plugin {modName} is loaded with version {modVersion}!");
         }
 
-        private static Item MakeNonScrap(int price)
+        public class ClonedItem : Item
         {
-            Item nonScrap = ScriptableObject.CreateInstance<Item>();
+            public Item original;
+        }
+
+        private static ClonedItem MakeNonScrap(int price)
+        {
+            ClonedItem nonScrap = ScriptableObject.CreateInstance<ClonedItem>();
             DontDestroyOnLoad(nonScrap);
             nonScrap.name = "Error";
             nonScrap.itemName = "Error";
@@ -108,9 +113,10 @@ namespace BuyableShotgunShells
             return nonScrap;
         }
 
-        private static GameObject CloneNonScrap(Item original, Item clone, int price)
+        private static GameObject CloneNonScrap(Item original, ClonedItem clone, int price)
         {
             GameObject.Destroy(clone.spawnPrefab);
+            clone.original = original;
             var prefab = NetworkPrefabs.CloneNetworkPrefab(original.spawnPrefab);
             prefab.AddComponent<Unflagger>();
             DontDestroyOnLoad(prefab);
