@@ -33,7 +33,6 @@ namespace BuyableShotgunShells
         public static List<Item> AllItems => Resources.FindObjectsOfTypeAll<Item>().Reverse().ToList();
         public static Item ShotgunShell => AllItems.FirstOrDefault(item => item.name.Equals("GunAmmo") && item.spawnPrefab != null);
         public static ClonedItem ShotgunShellClone { get; private set; }
-        public static GameObject ShotgunShellObjectClone { get; private set; }
 
 
         private static ConfigEntry<int> ShellPriceConfig;
@@ -52,9 +51,6 @@ namespace BuyableShotgunShells
             }
             harmony.PatchAll();
             ShellPriceConfig = Config.Bind("Prices", "ShotgunShellPrice", 20, "Credits needed to buy shotgun shells");
-            //SceneManager.sceneLoaded += OnSceneLoaded;
-            ShotgunShellClone = MakeNonScrap(ShellPrice);
-            AddToShop();
             Logger.LogInfo($"Plugin {modName} is loaded with version {modVersion}!");
         }
 
@@ -63,61 +59,12 @@ namespace BuyableShotgunShells
             public Item original;
         }
 
-        private static ClonedItem MakeNonScrap(int price)
+        private static ClonedItem CloneNonScrap(Item original, int price)
         {
-            ClonedItem nonScrap = ScriptableObject.CreateInstance<ClonedItem>();
-            DontDestroyOnLoad(nonScrap);
-            nonScrap.name = "Error";
-            nonScrap.itemName = "Error";
-            nonScrap.itemId = 6624;
-            nonScrap.isScrap = false;
-            nonScrap.creditsWorth = price;
-            nonScrap.canBeGrabbedBeforeGameStart = true;
-            nonScrap.automaticallySetUsingPower = false;
-            nonScrap.batteryUsage = 300;
-            nonScrap.canBeInspected = false;
-            nonScrap.isDefensiveWeapon = true;
-            nonScrap.saveItemVariable = true;
-            nonScrap.syncGrabFunction = false;
-            nonScrap.twoHandedAnimation = true;
-            nonScrap.verticalOffset = 0.25f;
-            var prefab = LethalLib.Modules.NetworkPrefabs.CreateNetworkPrefab("Cube");
-            var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            cube.transform.SetParent(prefab.transform, false);
-            cube.GetComponent<MeshRenderer>().sharedMaterial.shader = Shader.Find("HDRP/Lit");
-            prefab.AddComponent<BoxCollider>().size = Vector3.one * 2;
-            prefab.AddComponent<AudioSource>();
-            var prop = prefab.AddComponent<PhysicsProp>();
-            prop.itemProperties = nonScrap;
-            prop.grabbable = true;
-            nonScrap.spawnPrefab = prefab;
-            prefab.tag = "PhysicsProp";
-            prefab.layer = LayerMask.NameToLayer("Props");
-            cube.layer = LayerMask.NameToLayer("Props");
-            try
-            {
-                GameObject scanNode = GameObject.Instantiate<GameObject>(Items.scanNodePrefab, prefab.transform);
-                scanNode.name = "ScanNode";
-                scanNode.transform.localPosition = new Vector3(0f, 0f, 0f);
-                scanNode.transform.localScale *= 2;
-                ScanNodeProperties properties = scanNode.GetComponent<ScanNodeProperties>();
-                properties.nodeType = 1;
-                properties.headerText = "Error";
-                properties.subText = $"A mod is incompatible with {modName}";
-            }
-            catch (Exception e)
-            {
-                LoggerInstance.LogError(e.ToString());
-            }
-            prefab.transform.localScale = Vector3.one / 2;
-            return nonScrap;
-        }
-
-        private static GameObject CloneNonScrap(Item original, ClonedItem clone, int price)
-        {
-            GameObject.Destroy(clone.spawnPrefab);
+            ClonedItem clone = ScriptableObject.CreateInstance<ClonedItem>();
+            DontDestroyOnLoad(clone);
             clone.original = original;
-            var prefab = NetworkPrefabs.CloneNetworkPrefab(original.spawnPrefab);
+            var prefab = NetworkPrefabs.CloneNetworkPrefab(original.spawnPrefab, "Buyable" + original.name);
             prefab.AddComponent<Unflagger>();
             DontDestroyOnLoad(prefab);
             CopyFields(original, clone);
@@ -125,7 +72,8 @@ namespace BuyableShotgunShells
             clone.spawnPrefab = prefab;
             clone.name = "Buyable" + original.name;
             clone.creditsWorth = price;
-            return prefab;
+            clone.isScrap = false;
+            return clone;
         }
 
         public static void CopyFields(Item source, Item destination)
@@ -150,17 +98,13 @@ namespace BuyableShotgunShells
             return node;
         }
 
-        private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-        {
-            CloneShells();
-        }
-
         private static void CloneShells()
         {
             if (ShotgunShell == null) return;
-            if (ShotgunShellObjectClone != null) return;
-            ShotgunShellObjectClone = CloneNonScrap(ShotgunShell, ShotgunShellClone, ShellPrice);
+            if (ShotgunShellClone != null) return;
+            ShotgunShellClone = CloneNonScrap(ShotgunShell, ShellPrice);
             ShotgunShellClone.itemName = "Shells";
+            AddToShop();
         }
 
         private static void AddToShop()
