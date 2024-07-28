@@ -1,3 +1,7 @@
+### 1.3.0
+- Fixed only being visible on host (this was caused by my silly mistake)
+- A small fix to not use shells from modded moons.
+
 #### 1.2.1
 - No longer breaks if another mod adds in shells that have no spawn prefab.
 - Changed to load with a patch instead of the scene loaded event so that this mod doesn't break when somebody else's mod exceptions in that event.
