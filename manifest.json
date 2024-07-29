@@ -1,8 +1,10 @@
 {
+  "$schema": "https://raw.githubusercontent.com/MegaPiggy/thunderstore.manifest/main/v1/r2modman/schema.json",
   "name": "BuyableShotgunShells",
   "version_number": "1.3.0",
   "website_url": "https://github.com/MegaPiggy/LethalCompanyBuyableShotgunShells",
   "description": "Adds shotgun shells to the store for 20 credits (Configurable)",
+  "author": "MegaPiggy",
   "dependencies": [
     "BepInEx-BepInExPack-5.4.2100",
     "Evaisa-LethalLib-0.13.2",
