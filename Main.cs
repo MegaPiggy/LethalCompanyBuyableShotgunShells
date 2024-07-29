@@ -17,6 +17,12 @@ using GameNetcodeStuff;
 namespace BuyableShotgunShells
 {
     [BepInDependency("evaisa.lethallib", "0.13.2")]
+    [BepInIncompatibility("firearmlicense")]
+    [BepInIncompatibility("Entity378.BuyableShotgunPlus")]
+    [BepInIncompatibility("PC_Principal.ShotgunShellsInStore")]
+    [BepInIncompatibility("Venom.BuyPatrons")]
+    [BepInIncompatibility("Hypick.BetterShotgun")]
+    [BepInIncompatibility("SalakStudios.BetterShotgunShells")]
     [BepInPlugin(modGUID, modName, modVersion)]
     public class BuyableShotgunShells : BaseUnityPlugin
     {
